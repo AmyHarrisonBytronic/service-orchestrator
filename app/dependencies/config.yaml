@@ -1,5 +1,5 @@
 services:
-  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/camera-service"
+  - service_directory: "https://github.com/AmyHarrisonBytronic/camera-service"
     service_id: "camera_service"
     config_details:
       mqtt:
