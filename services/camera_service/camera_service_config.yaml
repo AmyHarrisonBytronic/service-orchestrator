@@ -1,0 +1,20 @@
+archiving:
+  archive_directory: save_dir
+  archive_params:
+    archive_days: 30
+    archive_freq: daily
+    archive_storage: 50
+  is_archived: true
+camera:
+  camera_id: '0001'
+  camera_type: basler
+  capture_timeout: 10
+  pixel_format: BayerRG8
+  trigger_type: software
+mqtt:
+  image_topic: magnapower/image/colour_image
+  ip: localhost
+  message: null
+  port: 1883
+  trigger_time_topic: magnapower/image/trigger_time
+  trigger_topic: magnapower/hmi/instruction

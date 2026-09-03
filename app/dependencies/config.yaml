@@ -1,0 +1,34 @@
+services:
+  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/camera-service"
+    service_id: "camera_service"
+    config_details:
+      mqtt:
+        ip: "localhost"
+        port: 1883
+        trigger_topic: "magnapower/hmi/instruction"
+        image_topic: "magnapower/image/colour_image"
+        trigger_time_topic: "magnapower/image/trigger_time"
+        message: null
+
+      camera:
+        camera_type: "basler"
+        camera_id: "0001"
+        pixel_format: "BayerRG8"
+        trigger_type: "software"
+        capture_timeout: 10
+
+      archiving:
+        is_archived: true
+        archive_directory: "save_dir"
+        archive_params:
+          archive_freq: "daily"
+          archive_storage: 50
+          archive_days: 30
+
+  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/inference-service"
+    service_id: "inference_service"
+    config_details: {}
+
+  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/dio-service"
+    service_id: "dio_service"
+    config_details: {}
