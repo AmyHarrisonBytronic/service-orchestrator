@@ -1,5 +1,6 @@
 services:
   - service_directory: "https://github.com/AmyHarrisonBytronic/camera-service"
+    repository_name: "camera-service"
     service_id: "camera_service"
     config_details:
       mqtt:
@@ -26,9 +27,11 @@ services:
           archive_days: 30
 
   - service_directory: "https://github.com/Bytronic-Vision-Intelligence/inference-service"
+    repository_name: "camera-service"
     service_id: "inference_service"
     config_details: {}
 
   - service_directory: "https://github.com/Bytronic-Vision-Intelligence/dio-service"
+    repository_name: "camera-service"
     service_id: "dio_service"
     config_details: {}
