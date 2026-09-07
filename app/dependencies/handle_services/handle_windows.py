@@ -11,6 +11,7 @@ class HandleWindowsService(HandleService):
     '''Handle services on the windoes platform'''
 
     def __init__(self):
+        self.processes=dict()
         self.process_list = []
         self.watch_threads = []
         self.watch_queues = []
@@ -22,20 +23,29 @@ class HandleWindowsService(HandleService):
         '''
         return self.process_list
 
-    def launch_service(self, executable_path:str, *args):
+    def launch_service(self, executable_path:str, *argument_list:str):
         '''launches a microservice on the windows platform and returns the process id
         Args:
-            service_name: a string containing the service name
-        Returns:
-            the process ID as a string'''
+            executable_path: the path to the executable
+            *argument_list: a list of arguments to pass to the executable
+        '''
         try:
             process = subprocess.Popen(
-                [executable_path, *args],
+                [executable_path, *argument_list],
                 shell=False,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
-            print(f"Program launched successfully. PID: {process.pid}")
+            print(f"Program launched successfully. PID: {process.pid}") 
+            process_id = str(process.pid)
+            
+            self.processes[process_id] = {
+                "launch_args": list(argument_list),
+                "executable_path": executable_path,
+                "launch_attempts": 0,
+                "process": process,
+            }
+
             self.process_list.append(process)
             self.start_watch_thread(process)
         except Exception as e:
@@ -59,8 +69,14 @@ class HandleWindowsService(HandleService):
                 process_instance = psutil.Process(process.pid)
             except:
                 queue.put([process.pid,False])
-                self.process_list.remove(process)
-                print(f"Error: pricess {process.pid} has died")
+                print(f"Error: pricess {process.pid} has died relaunching")
+                if self.processes[f"{process.pid}"]["launch_attempts"] > 2:return
+
+                self.launch_service(
+                    self.processes[f"{process.pid}"]["executable_path"], 
+                    self.processes[f"{process.pid}"]["launch_args"]
+                )
+                self.processes[f"{process.pid}"]["launch_attempts"] += 1
                 return
 
             queue.put([process.pid,process_instance.is_running() and process_instance.status() != psutil.STATUS_ZOMBIE])

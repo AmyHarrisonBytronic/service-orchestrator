@@ -3,6 +3,7 @@ from dependencies.directory_functions import create_service_directory, create_co
 from dependencies.handle_services import handle_windows
 import dependencies.github_functions as GitFunction
 from dependencies import loadConfig
+import time
 
 CONFIG = loadConfig.get_config()
 
@@ -53,6 +54,9 @@ def main(services):
 
         executables = find_executable(directory_path)
         _launch_services(executables,service_id, directory_path)
+        
+    while True:
+        time.sleep(0.5)
 
 if __name__ == "__main__":
     global service_handler
