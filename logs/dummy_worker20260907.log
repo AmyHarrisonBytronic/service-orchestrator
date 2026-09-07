@@ -1,0 +1,5 @@
+2026-09-07 16:28:39,333 - [PID 2260] - INFO - Connecting to localhost:1883 as mqtt-client-40361723
+2026-09-07 16:28:39,529 - [PID 2260] - INFO - Connected to localhost:1883
+2026-09-07 16:28:39,529 - [PID 2260] - INFO - Connecting to localhost:1883 as mqtt-client-4fa0a2a2
+2026-09-07 16:28:39,547 - [PID 2260] - INFO - Connected to localhost:1883
+2026-09-07 16:28:39,548 - [PID 2260] - INFO - Subscribed to 'magnapower/hmi/instruction' (QoS 0)

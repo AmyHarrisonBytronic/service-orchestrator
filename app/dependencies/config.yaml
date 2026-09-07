@@ -1,3 +1,7 @@
+system_details:
+  - platform: windows
+    git_owner: AmyHarrisonBytronic
+
 services:
   - service_directory: "https://github.com/AmyHarrisonBytronic/camera-service"
     repository_name: "camera-service"
@@ -12,11 +16,13 @@ services:
         message: null
 
       camera:
-        camera_type: "basler"
+        camera_type: dummy
         camera_id: "0001"
-        pixel_format: "BayerRG8"
-        trigger_type: "software"
-        capture_timeout: 10
+        pixel_format: BayerRG8
+        trigger_type: software
+        dummy_location: "C:/Users/AmyHarrison/camera_worker/camera-worker/test/"
+        file_type: ".png"
+        capture_timout: 10
 
       archiving:
         is_archived: true
@@ -29,9 +35,9 @@ services:
   - service_directory: "https://github.com/Bytronic-Vision-Intelligence/inference-service"
     repository_name: "camera-service"
     service_id: "inference_service"
-    config_details: {}
+    config_details:
 
   - service_directory: "https://github.com/Bytronic-Vision-Intelligence/dio-service"
     repository_name: "camera-service"
     service_id: "dio_service"
-    config_details: {}
+    config_details:

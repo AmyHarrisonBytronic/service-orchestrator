@@ -23,3 +23,17 @@ def unzip_file(file_path:str, destination:str):
     ''''''
     with zipfile.ZipFile(file_path, 'r') as zip_ref:
         zip_ref.extractall(destination)
+
+def find_executable(directory_path)->str:
+    '''returns all executables found within a given directory
+    Args:
+        directory_path: the path to the directory
+    Returns:
+        a list of file paths
+    '''
+    executables = []
+    for root, dirs, files in os.walk(directory_path):
+        for file in files:
+            if file.endswith(".exe"):
+                executables.append(os.path.join(root, file))
+    return executables
