@@ -4,8 +4,8 @@ from dependencies.handle_services import handle_windows
 import dependencies.github_functions as GitFunction
 from dependencies import loadConfig
 import time
-from dependencies.state_machine import StateMachine
-
+from dependencies.state_machine.orchestrator_state_machine import OrchestratorStateMachine
+from dependencies.state_machine.uninitialized_state import UninitializedState
 CONFIG = loadConfig.get_config()
 
 def require(config: dict, key: str):
@@ -39,9 +39,14 @@ def _launch_services(executables, service_name, directory_path):
         if not "main.exe" in executable: continue
         service_handler.launch_service(executable,0, "--config", f"{directory_path}/{service_name}_config.yaml")
 
-def main(services):
+def main(services, system_details):
     ''''''
-    orchestrator_runtime = StateMachine()
+    orchestrator_runtime = OrchestratorStateMachine(system_details, service_handler)
+    orchestrator_runtime.state = UninitializedState(orchestrator_runtime)
+
+    while True:
+        orchestrator_runtime.state.tick()
+    
     system_details = require(CONFIG, "system_details")[0]
     for service in services:
         service_id = service["service_id"]
@@ -65,4 +70,4 @@ if __name__ == "__main__":
     services = require(CONFIG, "services")
     system_details =require(CONFIG, "system_details")[0]
     service_handler = _set_handler(system_details.get("platform"))
-    main(services)
+    main(services, system_details)

@@ -1,6 +1,19 @@
 system_details:
   - platform: windows
     git_owner: AmyHarrisonBytronic
+    broker_details:
+      mqtt_ip: "localhost"
+      mqtt_port: 1883
+      topics: 
+      - name: "receive_update_command"
+        topic: "test/image/update"
+        is_subscribe: True
+        is_trigger: True
+      
+      - name: "reveive_shutdown_command"
+        topic: "test/hmi/update"
+        is_subscribe: True
+        is_trigger: True
 
 services:
   - service_directory: "https://github.com/AmyHarrisonBytronic/camera-service"
