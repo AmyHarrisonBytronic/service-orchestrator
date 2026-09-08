@@ -12,11 +12,8 @@ class HandleWindowsService(HandleService):
 
     def __init__(self):
         self.processes=dict()
-        self.process_list = []
-        self.watch_threads = []
-        self.watch_queues = []
 
-    def launch_service(self, executable_path:str, *argument_list:str):
+    def launch_service(self, executable_path:str, lauch_attempts:int = 0, *argument_list:str):
         '''launches a microservice on the windows platform and returns the process id
         Args:
             executable_path: the path to the executable
@@ -35,11 +32,10 @@ class HandleWindowsService(HandleService):
             self.processes[process_id] = {
                 "launch_args": list(argument_list),
                 "executable_path": executable_path,
-                "launch_attempts": 0,
+                "launch_attempts": lauch_attempts,
                 "process": process,
             }
 
-            self.process_list.append(process)
             self._start_watch_thread(process)
         except Exception as e:
             print(f"Error: '{e}'")
@@ -63,7 +59,6 @@ class HandleWindowsService(HandleService):
                 queue.put([process.pid,process_instance.is_running() and process_instance.status() != psutil.STATUS_ZOMBIE])
             except:
                 queue.put([process.pid,False])
-                self.process_list.remove(process)
 
                 print(f"Error: process {process.pid} is no longer acive")
 
@@ -71,21 +66,38 @@ class HandleWindowsService(HandleService):
 
                 print(f"Info : reviving process {process.pid}")
                 self.launch_service(
-                    self.processes[f"{process.pid}"]["executable_path"], 
+                    self.processes[f"{process.pid}"]["executable_path"],
+                    self.processes[f"{process.pid}"]["launch_attempts"] +1,
                     *self.processes[f"{process.pid}"]["launch_args"]
                 )
-                self.processes[f"{process.pid}"]["launch_attempts"] += 1
+                self._remove_by_key(f"{process.pid}")
                 return
 
             time.sleep(1)
 
+    def _remove_by_key(self, key: str):
+        """
+        Removes a nested dictionary item from self.processes by key.
+
+        Args:
+            key: The key to remove.
+        """
+        removed = self.processes.pop(key, None)
+        if removed is None:
+            print(f"Key '{key}' not found in processes.")
+
     def _start_watch_thread(self, process):
         ''''''
-        self.watch_queues.append(Queue())
+        process_id = str(process.pid)
+        try:
+            self.processes[process_id]["queue"] = Queue()
+        except Exception as e:
+            print(e)
+
         watch_thread = Thread(
             target=self.check_service_status,
-            args=(process, self.watch_queues[len(self.watch_queues)-1]),
+            args=(process, self.processes[process_id]["queue"]),
             daemon = True,
         )
         watch_thread.start()
-        self.watch_threads.append(watch_thread)
+        self.processes[process_id]["watch_thread"] = watch_thread

@@ -36,7 +36,7 @@ def _launch_services(executables, service_name, directory_path):
     ''''''
     for executable in executables:
         if not "main.exe" in executable: continue
-        service_handler.launch_service(executable, "--config", f"{directory_path}/{service_name}_config.yaml")
+        service_handler.launch_service(executable,0, "--config", f"{directory_path}/{service_name}_config.yaml")
 
 def main(services):
     ''''''
@@ -54,7 +54,7 @@ def main(services):
 
         executables = find_executable(directory_path)
         _launch_services(executables,service_id, directory_path)
-        
+
     while True:
         time.sleep(0.5)
 
