@@ -4,6 +4,7 @@ from dependencies.handle_services import handle_windows
 import dependencies.github_functions as GitFunction
 from dependencies import loadConfig
 import time
+from dependencies.state_machine import StateMachine
 
 CONFIG = loadConfig.get_config()
 
@@ -40,6 +41,7 @@ def _launch_services(executables, service_name, directory_path):
 
 def main(services):
     ''''''
+    orchestrator_runtime = StateMachine()
     system_details = require(CONFIG, "system_details")[0]
     for service in services:
         service_id = service["service_id"]
