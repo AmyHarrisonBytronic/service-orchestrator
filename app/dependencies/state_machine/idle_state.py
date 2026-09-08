@@ -17,12 +17,13 @@ class IdleState(State):
     def tick(self):
         ''''''
         time.sleep(0.5)
-        trigger_message = check_trigger(self.my_state_machine.topics)
-        if trigger_message == None: return
+        trigger_message = check_trigger(self.my_state_machine.topics[0])
+        print(trigger_message)
+        if not "orchestrator_command" in trigger_message: return
 
-        if "update_services" in trigger_message:
-            self.my_state_machine.change_state(UpdateState)
-        if "kill_process" in trigger_message:
+        if "update_services" in trigger_message["orchestrator_command"]:
+            self.my_state_machine.change_state(UpdateState(self.my_state_machine))
+        if "kill_process" in trigger_message["orchestrator_command"]:
             print("exiting process")
-        if "restart_process" in trigger_message:
+        if "restart_process" in trigger_message["orchestrator_command"]:
             print("restarting process")

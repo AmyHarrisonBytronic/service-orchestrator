@@ -1,7 +1,10 @@
-from state import State
+from .state import State
+try:
+    from .uninitialized_state import UninitializedState
+except:
+    print("Info: unitialized state already imported")
 from dependencies.directory_functions import find_executable, find_filetype, unzip_file
 import dependencies.github_functions as GitFunction
-from .uninitialized_state import UninitializedState
 import os
 
 class UpdateState(State):
@@ -11,7 +14,6 @@ class UpdateState(State):
 
     def tick(self):
         ''''''
-
         for service in self.my_state_machine.services:
             service_id = service["service_id"]
             destination = f"{os.getcwd()}/services"
@@ -31,4 +33,4 @@ class UpdateState(State):
 
             unzip_file(compressed_service, directory_path)
 
-        self.my_state_machine.change_state(UninitializedState)
+        self.my_state_machine.change_state(UninitializedState(self.my_state_machine))
