@@ -19,6 +19,7 @@ class IdleState(State):
     def tick(self):
         ''''''
         time.sleep(0.5)
+        print("trigger")
         trigger_message = check_trigger(self.my_state_machine.topics)
         if trigger_message == None: return
 

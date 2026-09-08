@@ -41,7 +41,7 @@ def _launch_services(executables, service_name, directory_path):
 
 def main(services, system_details):
     ''''''
-    orchestrator_runtime = OrchestratorStateMachine(system_details, service_handler)
+    orchestrator_runtime = OrchestratorStateMachine(system_details, services, service_handler)
     orchestrator_runtime.state = UninitializedState(orchestrator_runtime)
 
     while True:

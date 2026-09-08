@@ -9,10 +9,11 @@ from loadConfig import  require
 
 class OrchestratorStateMachine(StateMachine):
     ''''''
-    def __init__(self, config:dict, service_handler):
+    def __init__(self, config:dict,services:dict, service_handler):
         self.state = None
         self.config = config
-        self.broker = require(self.config, "broker_details")
-        self.topics = require(self.config["broker_details"], "topics")
+        self.broker = require(config, "broker_details")
+        self.topics = require(config["broker_details"], "topics")
+        self.services = services
         self.client = None
-        self.service_Handler = service_handler
+        self.service_handler = service_handler

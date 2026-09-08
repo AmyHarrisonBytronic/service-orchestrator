@@ -1,5 +1,5 @@
 from .state import State
-from .idle_state import IdleState
+from .initialized_state import InitializationState
 import os
 import sys
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -19,16 +19,13 @@ class UninitializedState(State):
 
     def enter(self):
         ''''''
-        print(f"Info : Entering initialization state")
+        print(f"Info : Entering uninitialized state")
 
     def tick(self):
         ''''''
-        broker_details = require(self.my_state_machine.config, "broker_details")
-        topics = require(broker_details, "topics")
-
         self.my_state_machine.threads = start_subscribers(
-            broker_details, 
-            topics, 
+            self.my_state_machine.broker, 
+            self.my_state_machine.topics, 
             Event()
         )
 
@@ -38,8 +35,8 @@ class UninitializedState(State):
         )
         self.my_state_machine.client.connect()
 
-        self.my_state_machine.change_state(IdleState(self.my_state_machine))
+        self.my_state_machine.change_state(InitializationState(self.my_state_machine))
 
     def exit(self):
         ''''''
-        print(f"Info : Exiting initialization state")
+        print(f"Info : Exiting uninitialized state")
