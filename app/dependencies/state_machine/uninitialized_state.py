@@ -1,5 +1,5 @@
 from .state import State
-from .initialized_state import InitializationState
+from .initialized_state import InitializedState
 import os
 import sys
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -14,12 +14,8 @@ from mqtt_client import MQTTClient, MQTTConfig
 class UninitializedState(State):
     '''an initialisation state to be ran on startup, this handles all of the setup
     for the orchestrator then moves to the initial setup phase'''
-    def __init__(self,state_machine):
-        super().__init__(state_machine)
-
-    def enter(self):
-        ''''''
-        print(f"Info : Entering uninitialized state")
+    def __init__(self,state_machine, state_id:str = "Unititialized state"):
+        super().__init__(state_machine, state_id)
 
     def tick(self):
         ''''''
@@ -35,8 +31,4 @@ class UninitializedState(State):
         )
         self.my_state_machine.client.connect()
 
-        self.my_state_machine.change_state(InitializationState(self.my_state_machine))
-
-    def exit(self):
-        ''''''
-        print(f"Info : Exiting uninitialized state")
+        self.my_state_machine.change_state(InitializedState(self.my_state_machine))

@@ -4,15 +4,11 @@ from dependencies.directory_functions import create_service_directory, create_co
 import dependencies.github_functions as GitFunction
 import os
 
-class InitializationState(State):
+class InitializedState(State):
     '''checks to see if the service directories are present in the expected location
     if they arent they are installed in the services '''
-    def __init__(self, state_machine):
-        super().__init__(state_machine)
-
-    def enter(self):
-        ''''''
-        print("Info : Entering initialized state")
+    def __init__(self, state_machine, state_id:str="Initialized State"):
+        super().__init__(state_machine, state_id)
 
     def tick(self):
         ''''''
@@ -46,10 +42,6 @@ class InitializationState(State):
             self._launch_services(executables,service_id, directory_path)
 
         self.my_state_machine.change_state(IdleState(self.my_state_machine))
-
-    def exit(self):
-        ''''''
-        print("Info : Exiting initialized state")
 
     def _launch_services(self, executables, service_name, directory_path):
         ''''''

@@ -5,13 +5,8 @@ system_details:
       mqtt_ip: "localhost"
       mqtt_port: 1883
       topics: 
-      - name: "receive_update_command"
-        topic: "test/image/update"
-        is_subscribe: True
-        is_trigger: True
-      
-      - name: "reveive_shutdown_command"
-        topic: "test/hmi/update"
+      - name: "receive_command"
+        topic: "test/HMI/HMI_1/command"
         is_subscribe: True
         is_trigger: True
 
