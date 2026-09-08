@@ -19,12 +19,15 @@ class IdleState(State):
     def tick(self):
         ''''''
         time.sleep(0.5)
-        print("trigger")
         trigger_message = check_trigger(self.my_state_machine.topics)
         if trigger_message == None: return
 
-        if "update" in trigger_message:
+        if "update_services" in trigger_message:
             print("update command found")
+        if "kill_process" in trigger_message:
+            print("exiting process")
+        if "restart_process" in trigger_message:
+            print("restarting process")
 
     def exit(self):
         ''''''
