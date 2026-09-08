@@ -16,13 +16,6 @@ class HandleWindowsService(HandleService):
         self.watch_threads = []
         self.watch_queues = []
 
-    def get_process_list(self):
-        '''getter for process_list variable
-        Returns:
-            a list of processes that have been launched
-        '''
-        return self.process_list
-
     def launch_service(self, executable_path:str, *argument_list:str):
         '''launches a microservice on the windows platform and returns the process id
         Args:
@@ -38,7 +31,7 @@ class HandleWindowsService(HandleService):
             )
             print(f"Program launched successfully. PID: {process.pid}") 
             process_id = str(process.pid)
-            
+
             self.processes[process_id] = {
                 "launch_args": list(argument_list),
                 "executable_path": executable_path,
@@ -47,7 +40,7 @@ class HandleWindowsService(HandleService):
             }
 
             self.process_list.append(process)
-            self.start_watch_thread(process)
+            self._start_watch_thread(process)
         except Exception as e:
             print(f"Error: '{e}'")
 
@@ -67,22 +60,26 @@ class HandleWindowsService(HandleService):
         while True:
             try:
                 process_instance = psutil.Process(process.pid)
+                queue.put([process.pid,process_instance.is_running() and process_instance.status() != psutil.STATUS_ZOMBIE])
             except:
                 queue.put([process.pid,False])
-                print(f"Error: pricess {process.pid} has died relaunching")
+                self.process_list.remove(process)
+
+                print(f"Error: process {process.pid} is no longer acive")
+
                 if self.processes[f"{process.pid}"]["launch_attempts"] > 2:return
 
+                print(f"Info : reviving process {process.pid}")
                 self.launch_service(
                     self.processes[f"{process.pid}"]["executable_path"], 
-                    self.processes[f"{process.pid}"]["launch_args"]
+                    *self.processes[f"{process.pid}"]["launch_args"]
                 )
                 self.processes[f"{process.pid}"]["launch_attempts"] += 1
                 return
 
-            queue.put([process.pid,process_instance.is_running() and process_instance.status() != psutil.STATUS_ZOMBIE])
             time.sleep(1)
 
-    def start_watch_thread(self, process):
+    def _start_watch_thread(self, process):
         ''''''
         self.watch_queues.append(Queue())
         watch_thread = Thread(
