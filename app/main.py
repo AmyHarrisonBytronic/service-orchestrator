@@ -1,6 +1,9 @@
 import os
-import yaml
+from dependencies.directory_functions import create_service_directory, create_configs, unzip_file, find_executable
+from dependencies.handle_services import handle_windows
+import dependencies.github_functions as GitFunction
 from dependencies import loadConfig
+import time
 
 CONFIG = loadConfig.get_config()
 
@@ -19,31 +22,45 @@ def require(config: dict, key: str):
         raise SystemExit(f"Missing required config key '{key}' in {loadConfig.config_path()}")
     return config[key]
 
-def create_service_directory(service_name:str, service_path:str=""):
-    '''creates a directory based on the given service name'''
-    directory_path = f"{service_path}/{service_name}/"
-    if not os.path.exists(directory_path):
-        os.makedirs(directory_path)
-        print(f"directory path {directory_path} was created")
-    if not (os.path.isdir(directory_path)):
-        raise FileExistsError(f"Error : directory path {directory_path} was not created")
+def _set_handler(platform):
+    '''returns the appropriate service handler for the given platform
+    Args:
+        platform: a string containing the platform information
+    Return:
+        the appropriate service handler
+    '''
+    if platform == "windows":
+        return handle_windows.HandleWindowsService()
 
-
-def create_configs(service_name:str,service_path:str, config:dict):
+def _launch_services(executables, service_name, directory_path):
     ''''''
-    file_path = f"{service_path}/{service_name}/{service_name}_config.yaml"
-    with open(file_path, 'w') as file:
-        file.write(yaml.dump(config))
-        print(f"File '{file_path}' created successfully.")
+    for executable in executables:
+        if not "main.exe" in executable: continue
+        service_handler.launch_service(executable,0, "--config", f"{directory_path}/{service_name}_config.yaml")
 
-def main():
+def main(services):
     ''''''
-    services = require(CONFIG, "services")
+    system_details = require(CONFIG, "system_details")[0]
     for service in services:
-        create_service_directory(service["service_id"], f"{os.getcwd()}/services")
-        create_configs(service["service_id"], f"{os.getcwd()}/services", service["config_details"])
+        service_id = service["service_id"]
+        destination = f"{os.getcwd()}/services"
+        directory_path = f"{destination}/{service_id}"
 
-    
+        create_service_directory(service_id, destination)
+        create_configs(service_id, destination, service["config_details"])
+
+        compressed_service = GitFunction.download_service(system_details.get("platform"), system_details.get("git_owner"), f'{service["repository_name"]}',f"{directory_path}/", None)
+        unzip_file(compressed_service, directory_path)
+
+        executables = find_executable(directory_path)
+        _launch_services(executables,service_id, directory_path)
+
+    while True:
+        time.sleep(0.5)
 
 if __name__ == "__main__":
-    main()
+    global service_handler
+    services = require(CONFIG, "services")
+    system_details =require(CONFIG, "system_details")[0]
+    service_handler = _set_handler(system_details.get("platform"))
+    main(services)
