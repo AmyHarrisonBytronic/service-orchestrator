@@ -62,6 +62,20 @@ def get_config() -> dict:
         raise SystemExit(f"Config file not found: {path}")
     return load_yaml(path)
 
+def require(config: dict, key: str):
+    """Return a required top-level config value, or exit describing what is missing.
+
+    Args:
+        config: the loaded configuration mapping.
+        key: the top-level key the service cannot start without.
+    Returns:
+        the value stored under `key`.
+    Raises:
+        SystemExit: when `key` is absent, naming both the key and the file.
+    """
+    if key not in config:
+        raise SystemExit(f"Missing required config key '{key}' in {config_path()}")
+    return config[key]
 
 def return_config_value(key: str):
     """Return the value for `key` from the loaded config.

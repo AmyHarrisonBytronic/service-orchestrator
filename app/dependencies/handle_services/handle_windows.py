@@ -8,7 +8,7 @@ from queue import Queue
 
 processHandler = -1
 class HandleWindowsService(HandleService):
-    '''Handle services on the windoes platform'''
+    '''Handle services on the windows platform'''
 
     def __init__(self):
         self.processes=dict()

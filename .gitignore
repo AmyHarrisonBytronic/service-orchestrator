@@ -1,7 +1,9 @@
-*
+*logs
+*.log
 *services*
 *.zip
 *.exe
 */*_service*
 *__pycache__
 *.venv
+*.vscode

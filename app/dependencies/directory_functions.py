@@ -37,3 +37,18 @@ def find_executable(directory_path)->str:
             if file.endswith(".exe"):
                 executables.append(os.path.join(root, file))
     return executables
+
+def find_filetype(directory_path, type):
+    '''returns a list of each file matching a type in a given directory
+    Args:
+        directory_path: the path to the directory
+        type: the file type to search for
+    returns:
+        a list of file paths
+    '''
+    files = []
+    for root, dirs, files in os.walk(directory_path):
+        for file in files:
+            if file.endswith("type"):
+                files.append(os.path.join(root, file))
+    return files
