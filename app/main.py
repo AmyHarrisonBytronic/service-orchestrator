@@ -1,9 +1,5 @@
-import os
-from dependencies.directory_functions import create_service_directory, create_configs, unzip_file, find_executable
 from dependencies.handle_services import handle_windows
-import dependencies.github_functions as GitFunction
 from dependencies import loadConfig
-import time
 from dependencies.state_machine.orchestrator_state_machine import OrchestratorStateMachine
 from dependencies.state_machine.uninitialized_state import UninitializedState
 CONFIG = loadConfig.get_config()
@@ -34,7 +30,7 @@ def _set_handler(platform):
         return handle_windows.HandleWindowsService()
 
 def main(services, system_details):
-    ''''''
+    '''Orchestrator main '''
     orchestrator_runtime = OrchestratorStateMachine(system_details, services, service_handler)
     orchestrator_runtime.state = UninitializedState(orchestrator_runtime)
 
