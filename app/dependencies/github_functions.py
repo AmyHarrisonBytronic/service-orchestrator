@@ -11,6 +11,17 @@ def download_service(
     destination: str,
     token: str | None = None,
 ):
+    '''sends a request using the github api to download the latest release from a given repo
+    Args:
+        platform: a string describing the simple platform(windows, linux, macos)
+        owner: the name of the owner of the repo
+        repo: the repo to search
+        destination: the location to download the files to
+        toek: a personal access token
+    Returns:
+        the path of the downloaded release file
+    '''
+
     headers = {
         "Accept": "application/vnd.github+json",
     }
@@ -20,7 +31,11 @@ def download_service(
 
     api_url = f"https://api.github.com/repos/{owner}/{repo}/releases"
     response = requests.get(api_url, headers=headers, timeout=30)
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except Exception as e:
+        print(f"Error : api resonse : {e}")
+        return
 
     releases = response.json()
 

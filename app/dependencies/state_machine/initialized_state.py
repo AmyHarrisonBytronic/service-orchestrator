@@ -1,6 +1,7 @@
 from .state import State
 from .idle_state import IdleState
 from dependencies.directory_functions import create_service_directory, create_configs, unzip_file, find_executable
+from dependencies.credential_management.credential_functions import get_key
 import dependencies.github_functions as GitFunction
 import os
 
@@ -28,10 +29,9 @@ class InitializedState(State):
                     self.my_state_machine.config.get("platform"), 
                     self.my_state_machine.config.get("git_owner"), 
                     f'{service["repository_name"]}',f"{directory_path}/", 
-                    None
+                    get_key("ACCESS_TOKEN")
                 )
-
-                unzip_file(compressed_service, directory_path)
+                if compressed_service != None: unzip_file(compressed_service, directory_path)
 
         for service in self.my_state_machine.services:
             service_id = service["service_id"]

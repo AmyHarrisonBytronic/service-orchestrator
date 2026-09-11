@@ -1,6 +1,6 @@
 system_details:
   - platform: windows
-    git_owner: AmyHarrisonBytronic
+    git_owner: Bytronic-Vision-Intelligence
     broker_details:
       mqtt_ip: "localhost"
       mqtt_port: 1883
@@ -11,41 +11,178 @@ system_details:
         is_trigger: True
 
 services:
-  - service_directory: "https://github.com/AmyHarrisonBytronic/camera-service"
+  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/camera-service"
     repository_name: "camera-service"
-    service_id: "camera_service"
+    service_id: "colour_camera_service"
     config_details:
-      mqtt:
-        ip: "localhost"
-        port: 1883
-        trigger_topic: "magnapower/hmi/instruction"
-        image_topic: "magnapower/image/colour_image"
-        trigger_time_topic: "magnapower/image/trigger_time"
-        message: null
+      broker_details:
+        mqtt_ip: localhost
+        mqtt_port: 1883
+      topics:
+      - name: trigger_topic
+        topic: "churchill/ui/ui_1/instruction"
+        is_trigger: True
+        is_subscribe: True
+      - name: image_topic
+        topic: churchill/camera/colour_camera/image
+        is_trigger: false
+        is_subscribe: false
 
       camera:
-        camera_type: dummy
-        camera_id: "0001"
-        pixel_format: BayerRG8
-        trigger_type: software
-        dummy_location: "C:/Users/AmyHarrison/camera_worker/camera-worker/test/"
-        file_type: ".png"
-        capture_timout: 10
-
+        camera_type: pylon
+        serial_number: ""
+      camera_settings:
+        buffer_size: 0
+      trigger:
+        trigger_type: "software" 
       archiving:
         is_archived: true
         archive_directory: "save_dir"
-        archive_params:
+        archive_parameters:
           archive_freq: "daily"
           archive_storage: 50
           archive_days: 30
 
-  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/inference-service"
+  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/camera-service"
     repository_name: "camera-service"
-    service_id: "inference_service"
+    service_id: "depth_camera_service"
     config_details:
+      colour-camera-service:
+        broker_details:
+          mqtt_ip: localhost
+          mqtt_port: 1883
+        topics:
+        - name: trigger_topic
+          topic: "churchill/ui/ui_1/instruction"
+          is_trigger: True
+          is_subscribe: True
+        - name: image_topic
+          topic: churchill/camera/colour_camera/image
+          is_trigger: false
+          is_subscribe: false
 
-  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/dio-service"
-    repository_name: "camera-service"
-    service_id: "dio_service"
+        camera:
+          camera_type: pylon
+          serial_number: ""
+        camera_settings:
+          buffer_size: 0
+        trigger:
+          trigger_type: "software" 
+        archiving:
+          is_archived: true
+          archive_directory: "save_dir"
+          archive_parameters:
+            archive_freq: "daily"
+            archive_storage: 50
+            archive_days: 30
+
+  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/database-service"
+    repository_name: "database-service"
+    service_id: "database_service"
     config_details:
+      broker_details:
+        mqtt_ip: localhost
+        mqtt_port: 1883
+      topics:
+      - name: "request_command"
+        topic: "test/depth_analysts/search/sku_data"
+        is_subscribe: True
+        is_trigger: True
+      - name: "database_output"
+        topic: "test/database/search/matching_sku"
+        is_subscribe: False,
+        is_trigger: False
+      - name: "depth_data"
+        topic: "test/image/colour_image"
+        is_subscribe: True
+        is_trigger: False
+      - name: "colour_data"
+        topic: "test/image/colour_image"
+        is_subscribe: True
+        is_trigger: False
+
+      database:
+      - file_location: "database/test_database.db"
+        database_name: "test_database"
+        search_threshold: 20,
+        tables: 
+        - database_table: "test_table"
+
+  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/depth-analysts-service"
+    repository_name: "depth-analysts-service"
+    service_id: "depth_analysis_service"
+    config_details:
+      broker_details:
+        mqtt_ip: localhost
+        mqtt_port: 1883
+      topics:
+      - name: "receive_depth_image"
+        topic: "test/image/colour_image"
+        is_subscribe: True
+        is_trigger: True
+      - name: "receive_hmi_instruction"
+        topic: "test/hmi/instruction"
+        is_subscribe: True
+        is_trigger: True
+      - name: "send_depth_analysis"
+        topic: "test/depth_analysts/search/sku_data"
+        is_subscribe: False
+        is_trigger: False
+      - name: "receive_analysis_results"
+        topic: "test/database/search/matching_sku"
+        is_subscribe: True
+        is_trigger: True
+      image_options:
+        region_of_interest: [0,0,2500,3000]
+        trim_value: 0.0325
+
+      database_options:
+        database_name: "test_database"
+        database_table: "test_table"
+      
+  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/object-matching-service"
+    repository_name: "object-matching-service"
+    service_id: "object_matching_service"
+    config_details:
+      broker_details:
+        mqtt_ip: localhost
+        mqtt_port: 1883
+      topics:
+      - name: "receive_image"
+        topic: "test/image/colour_image"
+        is_subscribe: True
+        is_trigger: True
+      - name: "receive_database_list"
+        topic: "test/database/search/matching_sku"
+        is_subscribe: True
+        is_trigger: False
+      - name: "send_match_results"
+        topic: "test/object_matching/detection_results"
+        is_subscribe: False
+        is_trigger: False
+
+      matching_details:
+        match_count: 3
+
+  - service_directory: "https://github.com/Bytronic-Vision-Intelligence/logging-service-service"
+    repository_name: "logging-service-service"
+    service_id: "logging_service"
+    config_details:
+      broker_details:
+        mqtt_ip: localhost
+        mqtt_port: 1883
+      topics:
+        - name: log_input
+          topic: "project/logging/+"
+          is_subscribe: true
+          is_trigger: true
+        - name: unified_stream
+          topic: "project/ui/logging"
+          is_subscribe: false
+          is_trigger: false
+      logging:
+        directory: "logs"
+        max_bytes: 10485760
+        backup_count: 5
+        min_level: DEBUG
+        retention_days: 30
